@@ -23,6 +23,7 @@ export const EnquiryModal: React.FC<EnquiryModalProps> = ({
   const [cutoff, setCutoff] = useState(prefilledCutoff ? String(prefilledCutoff) : '');
   const [city, setCity] = useState('');
   const [notes, setNotes] = useState('');
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submittedData, setSubmittedData] = useState<{ id: string; message: string } | null>(null);
 
@@ -30,8 +31,9 @@ export const EnquiryModal: React.FC<EnquiryModalProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setErrorMessage(null);
     if (!name.trim() || !phone.trim()) {
-      alert('Please enter your full name and contact phone number.');
+      setErrorMessage('Please enter your full name and contact phone number.');
       return;
     }
 
@@ -67,7 +69,7 @@ export const EnquiryModal: React.FC<EnquiryModalProps> = ({
           colors: ['#0284c7', '#f59e0b', '#10b981'],
         });
       } else {
-        alert(data.error || 'Failed to submit inquiry. Please call admissions directly at +91 99768 88999.');
+        setErrorMessage(data.error || 'Failed to submit inquiry. Please call admissions directly at +91 99768 88999.');
       }
     } catch (err) {
       console.error('Enquiry submission error:', err);
@@ -157,6 +159,11 @@ export const EnquiryModal: React.FC<EnquiryModalProps> = ({
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-4">
+              {errorMessage && (
+                <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-600 dark:text-rose-400 text-xs font-semibold">
+                  {errorMessage}
+                </div>
+              )}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">

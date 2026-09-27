@@ -130,7 +130,14 @@ export const Chatbot: React.FC<ChatbotProps> = ({
 
   const toggleMic = () => {
     if (!recognitionRef.current) {
-      alert('Speech recognition is not supported in this browser. Please type your question.');
+      // Speech recognition not available
+      const notificationMsg: ChatMessage = {
+        id: `mic-warn-${Date.now()}`,
+        sender: 'bot',
+        text: 'Speech recognition is not supported in this browser environment. Please type your query in the input box below.',
+        timestamp: 'Just now',
+      };
+      setMessages((prev) => [...prev, notificationMsg]);
       return;
     }
 
@@ -236,7 +243,7 @@ export const Chatbot: React.FC<ChatbotProps> = ({
     } else if (action.actionType === 'call-helpline') {
       window.location.href = `tel:${action.payload || '+919976888999'}`;
     } else if (action.actionType === 'open-website') {
-      window.open(action.payload || 'https://egspec.org', '_blank');
+      window.location.href = action.payload || 'https://egspec.org';
     } else if (action.actionType === 'prompt' && action.payload) {
       handleSendMessage(action.payload);
     }
@@ -249,23 +256,21 @@ export const Chatbot: React.FC<ChatbotProps> = ({
   };
 
   const clearChat = () => {
-    if (confirm('Clear the current conversation?')) {
-      setMessages([
-        {
-          id: `welcome-fresh-${Date.now()}`,
-          sender: 'bot',
-          text: `Chat cleared. Ask me anything about **E.G.S. Pillay Engineering College (TNEA 3806)** courses, admissions, fees, scholarships, or placements!`,
-          timestamp: 'Just now',
-          actions: [
-            { label: 'TNEA Code & Cutoff', actionType: 'prompt', payload: 'What is the TNEA code and cutoff eligibility for EGS Pillay?' },
-            { label: 'Courses & Seats', actionType: 'prompt', payload: 'List all UG and PG courses available at EGS Pillay with seat intake.' },
-            { label: 'Placements & Companies', actionType: 'prompt', payload: 'What are the placement statistics and top recruiting companies?' }
-          ]
-        },
-      ]);
-      if ('speechSynthesis' in window) window.speechSynthesis.cancel();
-      onAiSpeakingChange?.(false);
-    }
+    setMessages([
+      {
+        id: `welcome-fresh-${Date.now()}`,
+        sender: 'bot',
+        text: `Chat refreshed. Ask me anything about **E.G.S. Pillay Engineering College (TNEA 3806)** courses, admissions, fees, scholarships, or placements!`,
+        timestamp: 'Just now',
+        actions: [
+          { label: 'TNEA Code & Cutoff', actionType: 'prompt', payload: 'What is the TNEA code and cutoff eligibility for EGS Pillay?' },
+          { label: 'Courses & Seats', actionType: 'prompt', payload: 'List all UG and PG courses available at EGS Pillay with seat intake.' },
+          { label: 'Placements & Companies', actionType: 'prompt', payload: 'What are the placement statistics and top recruiting companies?' }
+        ]
+      },
+    ]);
+    if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+    onAiSpeakingChange?.(false);
   };
 
   // Simple Markdown renderer

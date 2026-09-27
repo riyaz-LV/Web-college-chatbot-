@@ -36,6 +36,10 @@ export const Campus3DVisualizer: React.FC<Campus3DVisualizerProps> = ({
     const container = containerRef.current;
     if (!container) return;
 
+    let renderer: THREE.WebGLRenderer;
+    const width = container.clientWidth || 400;
+    const height = container.clientHeight || 360;
+
     // Scene
     const scene = new THREE.Scene();
     sceneRef.current = scene;
@@ -43,22 +47,27 @@ export const Campus3DVisualizer: React.FC<Campus3DVisualizerProps> = ({
     // Camera
     const camera = new THREE.PerspectiveCamera(
       45,
-      container.clientWidth / container.clientHeight,
+      width / height,
       0.1,
       1000
     );
     camera.position.set(0, 5, 26);
     cameraRef.current = camera;
 
-    // Renderer
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-    renderer.setSize(container.clientWidth, container.clientHeight);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.2;
-    container.innerHTML = '';
-    container.appendChild(renderer.domElement);
-    rendererRef.current = renderer;
+    // Renderer with try-catch for WebGL support
+    try {
+      renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'default' });
+      renderer.setSize(width, height);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+      renderer.toneMapping = THREE.ACESFilmicToneMapping;
+      renderer.toneMappingExposure = 1.2;
+      container.innerHTML = '';
+      container.appendChild(renderer.domElement);
+      rendererRef.current = renderer;
+    } catch (e) {
+      console.warn('WebGL is not supported or failed to initialize:', e);
+      return;
+    }
 
     // Ambient & Point Lights
     const ambientLight = new THREE.AmbientLight(0x0f2b5c, 2.5);
