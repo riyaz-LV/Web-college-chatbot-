@@ -1,0 +1,6 @@
+{
+  "name": "EGS Pillay Engineering College - AI College Enquiry Portal",
+  "description": "Official AI Admissions & College Enquiry Chatbot for E.G.S. Pillay Engineering College (Autonomous), Nagapattinam (egspec.org). Explore courses, TNEA code 3806, fees, placements, scholarships, and campus facilities.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
