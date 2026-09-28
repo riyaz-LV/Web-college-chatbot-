@@ -13,6 +13,7 @@ import {
   Home,
   PhoneCall,
   MapPin,
+  Map,
   Award,
   Sparkles,
   ExternalLink,
@@ -20,7 +21,12 @@ import {
   ShieldCheck,
   CheckCircle,
   HelpCircle,
-  Layers
+  Layers,
+  Compass,
+  ArrowRight,
+  Clock,
+  Phone,
+  Radio
 } from 'lucide-react';
 import { Campus3DVisualizer } from './components/Campus3DVisualizer.tsx';
 import { Chatbot } from './components/Chatbot.tsx';
@@ -29,11 +35,13 @@ import { CourseExplorer } from './components/CourseExplorer.tsx';
 import { PlacementShowcase } from './components/PlacementShowcase.tsx';
 import { CampusFacilities } from './components/CampusFacilities.tsx';
 import { EnquiryModal } from './components/EnquiryModal.tsx';
+import { CampusMapModal } from './components/CampusMapModal.tsx';
 import { COLLEGE_DATA, CourseInfo } from './data/collegeData.ts';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<'chatbot' | 'cutoff' | 'courses' | 'placements' | 'facilities'>('chatbot');
   const [isEnquiryModalOpen, setIsEnquiryModalOpen] = useState(false);
+  const [isMapModalOpen, setIsMapModalOpen] = useState(false);
   const [prefilledCutoff, setPrefilledCutoff] = useState<number | undefined>(undefined);
   const [prefilledCourse, setPrefilledCourse] = useState<string | undefined>(undefined);
   const [isAiSpeaking, setIsAiSpeaking] = useState(false);
@@ -46,7 +54,8 @@ export default function App() {
   };
 
   // Handle asking AI from cutoff calculator
-  const handleAskAiWithCutoff = (cutoff: number, eligibleCourses: string[]) => {
+  const handleAskAiWithCutoff = (cutoff: number, _eligibleCourses: string[]) => {
+    setActiveTopic(`TNEA Cutoff ${cutoff} marks`);
     setActiveTab('chatbot');
   };
 
@@ -69,17 +78,20 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-900 text-slate-100 flex flex-col selection:bg-amber-500 selection:text-slate-950 font-sans">
-      {/* Top Notification Bar */}
-      <div className="bg-gradient-to-r from-sky-950 via-indigo-950 to-slate-950 border-b border-sky-800/40 text-xs py-2 px-4">
+    <div className="min-h-screen bg-[#070b14] text-slate-100 flex flex-col selection:bg-amber-500 selection:text-slate-950 font-sans antialiased">
+      {/* 1. Curatorial Institutional Ribbon */}
+      <div className="bg-[#05080f] border-b border-slate-800/80 text-[11px] py-2 px-4 text-slate-400">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 text-center sm:text-left">
-          <div className="flex items-center gap-2">
-            <span className="bg-amber-500 text-slate-950 font-bold px-2 py-0.5 rounded text-[10px] tracking-wider uppercase">
-              TNEA Code 3806
-            </span>
-            <span className="text-slate-300">
-              Admissions Open for Academic Year 2026-2027 • B.E. / B.Tech / MBA / MCA
-            </span>
+          <div className="flex items-center gap-2 flex-wrap justify-center sm:justify-start">
+            <span className="font-bold text-amber-400 tracking-wider">TNEA CODE: 3806</span>
+            <span aria-hidden="true" className="text-slate-600">·</span>
+            <span>NAAC 'A++' Accredited</span>
+            <span aria-hidden="true" className="text-slate-600 hidden md:inline">·</span>
+            <span className="hidden md:inline">UGC Autonomous</span>
+            <span aria-hidden="true" className="text-slate-600 hidden lg:inline">·</span>
+            <span className="hidden lg:inline">Anna University Permanent Affiliation</span>
+            <span aria-hidden="true" className="text-slate-600">·</span>
+            <span className="text-sky-300">Admissions 2026-2027 Open</span>
           </div>
 
           <div className="flex items-center gap-4 text-slate-300">
@@ -87,64 +99,100 @@ export default function App() {
               href="tel:+919976888999"
               className="hover:text-amber-400 transition flex items-center gap-1 font-semibold text-sky-300"
             >
-              <PhoneCall className="w-3.5 h-3.5" />
-              Admissions: +91 99768 88999
+              <Phone className="w-3 h-3 text-amber-400" />
+              <span>Admissions: +91 99768 88999</span>
             </a>
-            <span className="hidden md:inline text-slate-600">|</span>
+            <span aria-hidden="true" className="text-slate-700 hidden sm:inline">|</span>
             <a
               href="https://egspec.org"
               target="_blank"
               rel="noopener noreferrer"
-              className="hover:text-amber-400 transition hidden md:flex items-center gap-1"
+              className="hover:text-amber-400 transition hidden sm:flex items-center gap-1 text-slate-400 hover:text-slate-200"
             >
-              Official Website: egspec.org
+              <span>egspec.org</span>
               <ExternalLink className="w-3 h-3" />
             </a>
           </div>
         </div>
       </div>
 
-      {/* Main Institution Header */}
-      <header className="bg-slate-900/90 backdrop-blur-md border-b border-slate-800 sticky top-0 z-40">
+      {/* 2. Top Bar Navigation Contract: [Brand Wordmark] - [Clean Nav Links] - [Actions] */}
+      <header className="bg-[#090e1a]/95 backdrop-blur-md border-b border-slate-800 sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3.5 flex items-center justify-between gap-4">
-          {/* Brand Logo & Name */}
+          
+          {/* Zone 1: Single Text Element Brand Wordmark */}
           <div className="flex items-center gap-3">
-            <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-amber-500 via-sky-600 to-indigo-700 flex items-center justify-center text-white shadow-lg shadow-sky-500/10 ring-2 ring-white/10 shrink-0">
-              <GraduationCap className="w-6 h-6" />
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-500 via-sky-600 to-indigo-700 flex items-center justify-center text-white shadow-lg shadow-sky-500/20 ring-1 ring-white/10 shrink-0">
+              <GraduationCap className="w-5 h-5" />
             </div>
-
             <div>
-              <div className="flex items-center gap-2">
-                <h1 className="font-extrabold text-base sm:text-lg tracking-tight text-white">
-                  E.G.S. PILLAY ENGINEERING COLLEGE
-                </h1>
-                <span className="hidden sm:inline text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
-                  AUTONOMOUS
-                </span>
+              <a href="/" className="font-extrabold text-base sm:text-lg tracking-tight text-white hover:text-amber-400 transition">
+                E.G.S. PILLAY ENGINEERING COLLEGE
+              </a>
+              <div className="text-[11px] text-slate-400 flex items-center gap-1.5">
+                <span>Autonomous</span>
+                <span aria-hidden="true">·</span>
+                <span className="text-amber-400 font-semibold">TNEA 3806</span>
+                <span aria-hidden="true">·</span>
+                <span>Nagapattinam</span>
               </div>
-              <p className="text-xs text-slate-400 hidden sm:block">
-                NAAC 'A++' Grade • Affiliated to Anna University, Chennai • Established 1995 • Nagapattinam
-              </p>
             </div>
           </div>
 
-          {/* Quick Actions */}
-          <div className="flex items-center gap-2 sm:gap-3">
-            <div className="hidden lg:flex items-center gap-2 bg-slate-800/80 px-3 py-1.5 rounded-xl border border-slate-700 text-xs">
-              <Award className="w-4 h-4 text-amber-400" />
-              <div>
-                <span className="text-[10px] text-slate-400 block leading-none">Counselling Code</span>
-                <span className="font-bold text-amber-400 text-xs">TNEA: 3806</span>
-              </div>
-            </div>
+          {/* Zone 2: Clean Text Navigation Links */}
+          <nav className="hidden lg:flex items-center gap-6 text-xs font-semibold text-slate-300">
+            <button
+              onClick={() => setActiveTab('chatbot')}
+              className={`hover:text-white transition pb-0.5 ${activeTab === 'chatbot' ? 'text-amber-400 border-b-2 border-amber-400 font-bold' : ''}`}
+            >
+              AI Counselor
+            </button>
+            <button
+              onClick={() => setActiveTab('cutoff')}
+              className={`hover:text-white transition pb-0.5 ${activeTab === 'cutoff' ? 'text-amber-400 border-b-2 border-amber-400 font-bold' : ''}`}
+            >
+              Cutoff Estimator
+            </button>
+            <button
+              onClick={() => setActiveTab('courses')}
+              className={`hover:text-white transition pb-0.5 ${activeTab === 'courses' ? 'text-amber-400 border-b-2 border-amber-400 font-bold' : ''}`}
+            >
+              Programs & Intake
+            </button>
+            <button
+              onClick={() => setActiveTab('placements')}
+              className={`hover:text-white transition pb-0.5 ${activeTab === 'placements' ? 'text-amber-400 border-b-2 border-amber-400 font-bold' : ''}`}
+            >
+              Placements (12 LPA)
+            </button>
+            <button
+              onClick={() => setActiveTab('facilities')}
+              className={`hover:text-white transition pb-0.5 ${activeTab === 'facilities' ? 'text-amber-400 border-b-2 border-amber-400 font-bold' : ''}`}
+            >
+              Hostels & FAQ
+            </button>
+          </nav>
 
+          {/* Zone 3: Primary Actions (Campus Map Modal + Request Callback) */}
+          <div className="flex items-center gap-2 sm:gap-3">
+            {/* New Campus Map Modal Button */}
+            <button
+              onClick={() => setIsMapModalOpen(true)}
+              className="text-xs font-bold px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700/80 text-sky-300 hover:text-white border border-slate-700 hover:border-sky-500/50 shadow-sm transition flex items-center gap-1.5 whitespace-nowrap"
+              title="Interactive 40-Acre Campus Map"
+            >
+              <Map className="w-3.5 h-3.5 text-sky-400" />
+              <span>Campus Map</span>
+            </button>
+
+            {/* Request Callback Modal Button */}
             <button
               onClick={() => {
                 setPrefilledCutoff(undefined);
                 setPrefilledCourse(undefined);
                 setIsEnquiryModalOpen(true);
               }}
-              className="text-xs font-bold px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 via-amber-600 to-amber-700 hover:from-amber-600 hover:to-amber-800 text-slate-950 shadow-lg shadow-amber-500/20 transition flex items-center gap-1.5"
+              className="text-xs font-bold px-4 py-2 rounded-xl bg-gradient-to-r from-amber-500 via-amber-600 to-amber-700 hover:from-amber-600 hover:to-amber-800 text-slate-950 shadow-md shadow-amber-500/10 transition flex items-center gap-1.5 whitespace-nowrap"
             >
               <PhoneCall className="w-3.5 h-3.5" />
               <span>Request Callback</span>
@@ -153,9 +201,10 @@ export default function App() {
         </div>
       </header>
 
-      {/* Hero 3D Animation & Quick Highlights */}
-      <section className="bg-gradient-to-b from-slate-900 via-slate-950 to-slate-900 px-4 sm:px-6 pt-6 pb-4">
+      {/* 3. Hero Visual Section: Interactive 3D Visualizer with Quick Utility Strip */}
+      <section className="bg-gradient-to-b from-[#090e1a] via-[#060a12] to-[#070b14] px-4 sm:px-6 pt-5 pb-3">
         <div className="max-w-7xl mx-auto space-y-4">
+          
           {/* 3D Visualizer Canvas */}
           <Campus3DVisualizer
             isAiSpeaking={isAiSpeaking}
@@ -163,61 +212,84 @@ export default function App() {
             activeTopic={activeTopic}
           />
 
-          {/* Key Facts Pill Marquee */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            <div className="bg-slate-800/60 backdrop-blur-md p-3 rounded-2xl border border-slate-700/60 flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-sky-500/10 text-sky-400 flex items-center justify-center shrink-0">
-                <Award className="w-5 h-5" />
+          {/* Operational Quick Utility Ribbon */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+            <button
+              onClick={() => setIsMapModalOpen(true)}
+              className="text-left bg-slate-900/80 hover:bg-slate-800/90 p-3.5 rounded-2xl border border-slate-800 hover:border-sky-500/40 transition group shadow-sm flex items-center justify-between"
+            >
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="w-9 h-9 rounded-xl bg-sky-500/10 text-sky-400 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                  <Map className="w-4 h-4" />
+                </div>
+                <div className="min-w-0">
+                  <span className="text-[10px] uppercase font-semibold text-slate-400 block tracking-wider">Interactive Map</span>
+                  <span className="font-bold text-xs sm:text-sm text-white truncate block">40+ Acre Campus Layout</span>
+                </div>
               </div>
-              <div className="min-w-0">
-                <span className="text-[10px] uppercase font-semibold text-slate-400 block truncate">Accreditation</span>
-                <span className="font-bold text-sm text-white truncate block">NAAC 'A++' Grade</span>
-              </div>
-            </div>
+              <ArrowRight className="w-3.5 h-3.5 text-slate-500 group-hover:text-sky-400 group-hover:translate-x-0.5 transition-all shrink-0 ml-1" />
+            </button>
 
-            <div className="bg-slate-800/60 backdrop-blur-md p-3 rounded-2xl border border-slate-700/60 flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center shrink-0">
-                <Layers className="w-5 h-5" />
+            <button
+              onClick={() => setActiveTab('cutoff')}
+              className="text-left bg-slate-900/80 hover:bg-slate-800/90 p-3.5 rounded-2xl border border-slate-800 hover:border-amber-500/40 transition group shadow-sm flex items-center justify-between"
+            >
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="w-9 h-9 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                  <Calculator className="w-4 h-4" />
+                </div>
+                <div className="min-w-0">
+                  <span className="text-[10px] uppercase font-semibold text-slate-400 block tracking-wider">Cutoff Calculator</span>
+                  <span className="font-bold text-xs sm:text-sm text-amber-400 truncate block">Check TNEA Eligibility</span>
+                </div>
               </div>
-              <div className="min-w-0">
-                <span className="text-[10px] uppercase font-semibold text-slate-400 block truncate">TNEA Code</span>
-                <span className="font-bold text-sm text-amber-400 truncate block">Code: 3806</span>
-              </div>
-            </div>
+              <ArrowRight className="w-3.5 h-3.5 text-slate-500 group-hover:text-amber-400 group-hover:translate-x-0.5 transition-all shrink-0 ml-1" />
+            </button>
 
-            <div className="bg-slate-800/60 backdrop-blur-md p-3 rounded-2xl border border-slate-700/60 flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center shrink-0">
-                <Briefcase className="w-5 h-5" />
+            <button
+              onClick={() => setActiveTab('placements')}
+              className="text-left bg-slate-900/80 hover:bg-slate-800/90 p-3.5 rounded-2xl border border-slate-800 hover:border-emerald-500/40 transition group shadow-sm flex items-center justify-between"
+            >
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="w-9 h-9 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                  <Briefcase className="w-4 h-4" />
+                </div>
+                <div className="min-w-0">
+                  <span className="text-[10px] uppercase font-semibold text-slate-400 block tracking-wider">Placement Record</span>
+                  <span className="font-bold text-xs sm:text-sm text-emerald-400 truncate block">12.00 LPA Highest</span>
+                </div>
               </div>
-              <div className="min-w-0">
-                <span className="text-[10px] uppercase font-semibold text-slate-400 block truncate">Placement High</span>
-                <span className="font-bold text-sm text-emerald-400 truncate block">12.00 LPA Package</span>
-              </div>
-            </div>
+              <ArrowRight className="w-3.5 h-3.5 text-slate-500 group-hover:text-emerald-400 group-hover:translate-x-0.5 transition-all shrink-0 ml-1" />
+            </button>
 
-            <div className="bg-slate-800/60 backdrop-blur-md p-3 rounded-2xl border border-slate-700/60 flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center shrink-0">
-                <BookOpen className="w-5 h-5" />
+            <button
+              onClick={() => setActiveTab('courses')}
+              className="text-left bg-slate-900/80 hover:bg-slate-800/90 p-3.5 rounded-2xl border border-slate-800 hover:border-indigo-500/40 transition group shadow-sm flex items-center justify-between"
+            >
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="w-9 h-9 rounded-xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                  <BookOpen className="w-4 h-4" />
+                </div>
+                <div className="min-w-0">
+                  <span className="text-[10px] uppercase font-semibold text-slate-400 block tracking-wider">Program Catalog</span>
+                  <span className="font-bold text-xs sm:text-sm text-indigo-300 truncate block">10 UG & 7 PG Branches</span>
+                </div>
               </div>
-              <div className="min-w-0">
-                <span className="text-[10px] uppercase font-semibold text-slate-400 block truncate">Programs Offered</span>
-                <span className="font-bold text-sm text-indigo-300 truncate block">10 UG & 7 PG Branches</span>
-              </div>
-            </div>
+              <ArrowRight className="w-3.5 h-3.5 text-slate-500 group-hover:text-indigo-400 group-hover:translate-x-0.5 transition-all shrink-0 ml-1" />
+            </button>
           </div>
         </div>
       </section>
 
-      {/* Main Content Area with Interactive Navigation Tabs */}
+      {/* 4. Tab Navigation Strip (Segmented Controls) */}
       <main className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 py-6">
-        {/* Navigation Tabs Bar */}
-        <div className="flex bg-slate-800/90 backdrop-blur-md p-1.5 rounded-2xl border border-slate-700/80 mb-6 overflow-x-auto no-scrollbar gap-1.5 shadow-lg">
+        <div className="flex bg-slate-900/90 p-1.5 rounded-2xl border border-slate-800 mb-6 overflow-x-auto no-scrollbar gap-1.5 shadow-md">
           <button
             onClick={() => setActiveTab('chatbot')}
             className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm whitespace-nowrap transition-all ${
               activeTab === 'chatbot'
                 ? 'bg-sky-600 text-white shadow-md'
-                : 'text-slate-400 hover:text-white hover:bg-slate-700/50'
+                : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
             }`}
           >
             <Bot className="w-4 h-4 text-amber-400" />
@@ -229,7 +301,7 @@ export default function App() {
             className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm whitespace-nowrap transition-all ${
               activeTab === 'cutoff'
                 ? 'bg-sky-600 text-white shadow-md'
-                : 'text-slate-400 hover:text-white hover:bg-slate-700/50'
+                : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
             }`}
           >
             <Calculator className="w-4 h-4" />
@@ -241,7 +313,7 @@ export default function App() {
             className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm whitespace-nowrap transition-all ${
               activeTab === 'courses'
                 ? 'bg-sky-600 text-white shadow-md'
-                : 'text-slate-400 hover:text-white hover:bg-slate-700/50'
+                : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
             }`}
           >
             <BookOpen className="w-4 h-4" />
@@ -253,7 +325,7 @@ export default function App() {
             className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm whitespace-nowrap transition-all ${
               activeTab === 'placements'
                 ? 'bg-sky-600 text-white shadow-md'
-                : 'text-slate-400 hover:text-white hover:bg-slate-700/50'
+                : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
             }`}
           >
             <Briefcase className="w-4 h-4" />
@@ -265,11 +337,11 @@ export default function App() {
             className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm whitespace-nowrap transition-all ${
               activeTab === 'facilities'
                 ? 'bg-sky-600 text-white shadow-md'
-                : 'text-slate-400 hover:text-white hover:bg-slate-700/50'
+                : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
             }`}
           >
             <Home className="w-4 h-4" />
-            Hostels, Buses & Scholarships
+            Hostels, Buses & FAQ
           </button>
         </div>
 
@@ -290,7 +362,7 @@ export default function App() {
               {/* Sidebar Quick Cards Column */}
               <div className="lg:col-span-4 space-y-4">
                 {/* Admissions Helpline Card */}
-                <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl p-5 border border-slate-700 shadow-xl">
+                <div className="bg-slate-900/90 rounded-2xl p-5 border border-slate-800 shadow-xl">
                   <div className="flex items-center gap-2 text-amber-400 font-bold text-xs uppercase tracking-wider mb-2">
                     <PhoneCall className="w-4 h-4" />
                     Direct Admission Helpline
@@ -299,44 +371,51 @@ export default function App() {
                     Talk to Admissions Officer
                   </h4>
                   <p className="text-xs text-slate-400 mb-4 leading-relaxed">
-                    Have doubts about management quota, lateral entry, or first graduate fee concession? Speak directly with our faculty counselors.
+                    Have questions about TNEA counselling cutoff, lateral entry, or First Graduate scholarship? Speak directly with faculty counselors.
                   </p>
 
                   <div className="space-y-2 mb-4">
                     <a
                       href="tel:+919976888999"
-                      className="block p-3 rounded-xl bg-slate-700/50 hover:bg-slate-700 text-xs font-semibold text-white border border-slate-600 transition"
+                      className="block p-3 rounded-xl bg-slate-800/70 hover:bg-slate-800 text-xs font-semibold text-white border border-slate-700 transition"
                     >
                       <div className="text-[10px] text-sky-300">Admission Hotline 1:</div>
-                      <div className="font-mono text-sm font-bold text-amber-400">+91 99768 88999</div>
+                      <div className="font-mono text-sm font-bold text-amber-400 tabular-nums">+91 99768 88999</div>
                     </a>
                     <a
                       href="tel:+918680954537"
-                      className="block p-3 rounded-xl bg-slate-700/50 hover:bg-slate-700 text-xs font-semibold text-white border border-slate-600 transition"
+                      className="block p-3 rounded-xl bg-slate-800/70 hover:bg-slate-800 text-xs font-semibold text-white border border-slate-700 transition"
                     >
                       <div className="text-[10px] text-sky-300">Admission Hotline 2:</div>
-                      <div className="font-mono text-sm font-bold text-amber-400">+91 86809 54537</div>
+                      <div className="font-mono text-sm font-bold text-amber-400 tabular-nums">+91 86809 54537</div>
                     </a>
                   </div>
 
-                  <button
-                    onClick={() => setIsEnquiryModalOpen(true)}
-                    className="w-full py-2.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs shadow-md transition flex items-center justify-center gap-1.5"
-                  >
-                    <MessageSquare className="w-3.5 h-3.5" />
-                    Request Instant Callback
-                  </button>
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      onClick={() => setIsMapModalOpen(true)}
+                      className="py-2.5 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs border border-slate-700 transition flex items-center justify-center gap-1.5"
+                    >
+                      <Map className="w-3.5 h-3.5 text-sky-400" />
+                      Campus Map
+                    </button>
+                    <button
+                      onClick={() => setIsEnquiryModalOpen(true)}
+                      className="py-2.5 px-3 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs shadow-md transition flex items-center justify-center gap-1.5"
+                    >
+                      <MessageSquare className="w-3.5 h-3.5" />
+                      Callback
+                    </button>
+                  </div>
                 </div>
 
                 {/* TNEA Counselling Badge Card */}
-                <div className="bg-slate-800/80 rounded-2xl p-5 border border-slate-700">
+                <div className="bg-slate-900/90 rounded-2xl p-5 border border-slate-800">
                   <div className="flex items-center justify-between mb-3">
-                    <span className="text-xs font-semibold text-slate-400">TNEA Code</span>
-                    <span className="text-xs font-bold px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">
-                      Anna University
-                    </span>
+                    <span className="text-xs font-semibold text-slate-400">TNEA Counselling Code</span>
+                    <span className="text-xs font-bold text-amber-400">Anna University</span>
                   </div>
-                  <div className="text-3xl font-extrabold text-amber-400 tracking-tight font-mono mb-1">
+                  <div className="text-3xl font-extrabold text-amber-400 tracking-tight font-mono tabular-nums mb-1">
                     3806
                   </div>
                   <p className="text-xs text-slate-400 leading-relaxed">
@@ -345,27 +424,27 @@ export default function App() {
                 </div>
 
                 {/* Quick Shortcuts */}
-                <div className="bg-slate-800/60 rounded-2xl p-4 border border-slate-700/60 space-y-2 text-xs">
+                <div className="bg-slate-900/60 rounded-2xl p-4 border border-slate-800 space-y-2 text-xs">
                   <div className="font-semibold text-slate-300 mb-2">Explore Next:</div>
                   <button
                     onClick={() => setActiveTab('cutoff')}
-                    className="w-full p-2.5 rounded-xl bg-slate-700/40 hover:bg-slate-700 text-left text-slate-200 transition flex items-center justify-between"
+                    className="w-full p-2.5 rounded-xl bg-slate-800/60 hover:bg-slate-800 text-left text-slate-200 transition flex items-center justify-between"
                   >
                     <span>Check Engineering Cutoff</span>
                     <span className="text-sky-400 font-bold">→</span>
                   </button>
                   <button
                     onClick={() => setActiveTab('courses')}
-                    className="w-full p-2.5 rounded-xl bg-slate-700/40 hover:bg-slate-700 text-left text-slate-200 transition flex items-center justify-between"
+                    className="w-full p-2.5 rounded-xl bg-slate-800/60 hover:bg-slate-800 text-left text-slate-200 transition flex items-center justify-between"
                   >
                     <span>View AI & DS and CSE Curriculum</span>
                     <span className="text-sky-400 font-bold">→</span>
                   </button>
                   <button
-                    onClick={() => setActiveTab('placements')}
-                    className="w-full p-2.5 rounded-xl bg-slate-700/40 hover:bg-slate-700 text-left text-slate-200 transition flex items-center justify-between"
+                    onClick={() => setIsMapModalOpen(true)}
+                    className="w-full p-2.5 rounded-xl bg-slate-800/60 hover:bg-slate-800 text-left text-slate-200 transition flex items-center justify-between"
                   >
-                    <span>View 780+ Job Offers & TCS/Zoho Recruiters</span>
+                    <span>View 40-Acre Campus Map (Hostels & Sports)</span>
                     <span className="text-sky-400 font-bold">→</span>
                   </button>
                 </div>
@@ -407,8 +486,8 @@ export default function App() {
         </div>
       </main>
 
-      {/* Footer */}
-      <footer className="bg-slate-950 border-t border-slate-800 text-slate-400 text-xs py-8 px-4 sm:px-6 mt-12">
+      {/* 5. Minimal Institutional Footer */}
+      <footer className="bg-[#05080f] border-t border-slate-800/80 text-slate-400 text-xs py-8 px-4 sm:px-6 mt-12">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="text-center md:text-left">
             <p className="font-bold text-slate-200 text-sm">
@@ -417,32 +496,56 @@ export default function App() {
             <p className="mt-1 text-slate-400">
               Old Nagore Main Road, Thethi Village, Nagore, Nagapattinam - 611 002, Tamil Nadu, India.
             </p>
-            <p className="text-[11px] text-slate-500 mt-1">
-              TNEA Code: 3806 • NAAC 'A++' Accredited • Affiliated to Anna University • Estd. 1995
-            </p>
+            <div className="text-[11px] text-slate-500 mt-1 flex items-center gap-2 justify-center md:justify-start">
+              <span>TNEA Code: 3806</span>
+              <span aria-hidden="true">·</span>
+              <span>NAAC 'A++' Accredited</span>
+              <span aria-hidden="true">·</span>
+              <span>Anna University</span>
+              <span aria-hidden="true">·</span>
+              <span>Estd. 1995</span>
+            </div>
           </div>
 
           <div className="flex flex-wrap items-center justify-center gap-4 text-slate-300">
+            <button
+              onClick={() => setIsMapModalOpen(true)}
+              className="hover:text-amber-400 transition flex items-center gap-1 text-sky-400"
+            >
+              <Map className="w-3.5 h-3.5" />
+              <span>Campus Map</span>
+            </button>
+            <span aria-hidden="true" className="text-slate-600">·</span>
             <a
               href="https://egspec.org"
               target="_blank"
               rel="noopener noreferrer"
               className="hover:text-amber-400 transition flex items-center gap-1"
             >
-              Official Website (egspec.org)
+              <span>egspec.org</span>
               <ExternalLink className="w-3 h-3" />
             </a>
-            <span>•</span>
+            <span aria-hidden="true" className="text-slate-600">·</span>
             <a href="tel:+919976888999" className="hover:text-amber-400 transition">
-              Call: +91 99768 88999
+              +91 99768 88999
             </a>
-            <span>•</span>
+            <span aria-hidden="true" className="text-slate-600">·</span>
             <a href="mailto:admission@egspec.org" className="hover:text-amber-400 transition">
               admission@egspec.org
             </a>
           </div>
         </div>
       </footer>
+
+      {/* Campus Map Interactive Modal */}
+      <CampusMapModal
+        isOpen={isMapModalOpen}
+        onClose={() => setIsMapModalOpen(false)}
+        onAskAiTopic={(topic) => {
+          setActiveTopic(topic);
+          setActiveTab('chatbot');
+        }}
+      />
 
       {/* Admission Enquiry Modal */}
       <EnquiryModal

@@ -32,25 +32,29 @@ interface StudentEnquiry {
 const enquiries: StudentEnquiry[] = [];
 
 // Initialize Gemini Client
-const apiKey = process.env.GEMINI_API_KEY;
-let ai: GoogleGenAI | null = null;
+let cachedAi: GoogleGenAI | null = null;
+let cachedKey = '';
 
-if (apiKey) {
-  try {
-    ai = new GoogleGenAI({
-      apiKey,
-      httpOptions: {
-        headers: {
-          'User-Agent': 'aistudio-build',
+function getAiClient(): GoogleGenAI | null {
+  const currentKey = process.env.GEMINI_API_KEY || '';
+  if (!currentKey) return null;
+  if (!cachedAi || cachedKey !== currentKey) {
+    try {
+      cachedAi = new GoogleGenAI({
+        apiKey: currentKey,
+        httpOptions: {
+          headers: {
+            'User-Agent': 'aistudio-build',
+          },
         },
-      },
-    });
-    console.log('[Gemini API] Client initialized successfully.');
-  } catch (err) {
-    console.error('[Gemini API] Error initializing client:', err);
+      });
+      cachedKey = currentKey;
+    } catch (err) {
+      console.error('[Gemini API] Error initializing client:', err);
+      return null;
+    }
   }
-} else {
-  console.warn('[Gemini API] GEMINI_API_KEY is not set. Intelligent grounded fallback responses will be used.');
+  return cachedAi;
 }
 
 // System instruction grounding the model in full EGS Pillay Engineering College details
@@ -225,7 +229,9 @@ app.post('/api/chat', async (req: Request, res: Response) => {
       return;
     }
 
-    if (ai) {
+    const aiClient = getAiClient();
+
+    if (aiClient) {
       try {
         // Build conversational contents
         const contents: Array<{ role: 'user' | 'model'; parts: Array<{ text: string }> }> = [];
@@ -246,7 +252,7 @@ app.post('/api/chat', async (req: Request, res: Response) => {
           parts: [{ text: message }],
         });
 
-        const response = await ai.models.generateContent({
+        const response = await aiClient.models.generateContent({
           model: 'gemini-3.8-flash',
           contents: contents as any,
           config: {
